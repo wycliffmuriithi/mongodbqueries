@@ -10,3 +10,16 @@ db.mpesaTransactions.aggregate([
         }},
     {$sort:{"_id.month":-1}}
 ])
+
+// the same operation using project to pre process the required fields
+
+db.mpesaTransactions.aggregate([
+    {"$project" : {
+            monthperformed: {$month:"$time"},transtypeid:"$transtypeid",amount:"$amount"
+        }},
+    {"$group" : {
+            _id:{monthperformed:"$monthperformed",transtype:"$transtypeid"},
+            total: {$sum:"$amount"},freq:{$sum:1}
+        }},
+    {$sort:{"_id.monthperformed":-1}}
+])
