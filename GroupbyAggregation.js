@@ -23,3 +23,19 @@ db.mpesaTransactions.aggregate([
         }},
     {$sort:{"_id.monthperformed":-1}}
 ])
+
+// group by query with date range condition
+
+db.mpesaTransactions.aggregate([
+    {"$match": {
+            "time": {"$gte":ISODate("2018-12-01T00:00:00.000Z"),"$lt":ISODate("2018-12-31T00:00:00.000Z")}
+        }},
+    {"$project" : {
+            monthperformed: {$month:"$time"},transtypeid:"$transtypeid",amount:"$amount"
+        }},
+    {"$group" : {
+            _id:{monthperformed:"$monthperformed",transtype:"$transtypeid"},
+            total: {$sum:"$amount"},freq:{$sum:1}
+        }},
+    {$sort:{"_id.monthperformed":-1}}
+])
